@@ -8,6 +8,8 @@
 import UIKit
 
 class TaskViewController: UIViewController {
+    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
     private lazy var taskTextField: UITextField = {
         let textField = UITextField()
         
@@ -31,7 +33,7 @@ class TaskViewController: UIViewController {
         buttonConfiguration.attributedTitle = AttributedString("Save task", attributes: attributes)
         
         return UIButton(configuration: buttonConfiguration, primaryAction: UIAction { _ in
-            self.dismiss(animated: true)
+            self.save()
         })
     }()
     
@@ -91,5 +93,19 @@ class TaskViewController: UIViewController {
             cancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40)
         ])
     }
-    
+   
+    private func save() {
+        let task = Task(context: context)
+        
+        task.name = taskTextField.text
+        dismiss(animated: true)
+        
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch let error {
+                print(error)
+            }
+        }
+    }
 }
